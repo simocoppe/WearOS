@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">LAYW</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="start_activity">Start Activity</string>
+    <string name="close_app">Close</string>
+    <string name="running">Running</string>
+    <string name="walking">Walking</string>
+    <string name="slow_walking">slow walking</string>
+    <string name="fast_walking">fast walking</string>
+    <string name="stop">STOP</string>
+    <string name="start">START</string>
+    <string name="close">close</string>
+    <string name="initialTimer">00:00:00</string>
+    <string name="bicycle">Bicycle</string>
+</resources>
