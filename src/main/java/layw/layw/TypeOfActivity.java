@@ -38,30 +38,5 @@ public class TypeOfActivity extends WearableActivity {
                 startActivity(new Intent(TypeOfActivity.this, GetHeartRate.class));
             }
         });
-
-        /*
-        Button buttonRunning = findViewById(R.id.buttonRunning);
-        buttonRunning.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(TypeOfActivity.this, Running.class));
-            }
-        });
-
-        Button buttonBicycle = findViewById(R.id.buttonBicycle);
-        buttonBicycle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(TypeOfActivity.this, Bicycle.class));
-            }
-        });
-
-        Button buttonWalking = findViewById(R.id.buttonWalking);
-        buttonWalking.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(TypeOfActivity.this, Walk.class));
-            }
-        });*/
     }
 }

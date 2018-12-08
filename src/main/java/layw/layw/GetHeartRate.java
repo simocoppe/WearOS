@@ -15,9 +15,47 @@ import android.widget.Chronometer;
 import android.widget.TextView;
 
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+
+
 public class GetHeartRate extends WearableActivity implements SensorEventListener {
 
-    private TextView mTextView;
     private Button btStart;
     private Button btStop;
     private Button btClose;
@@ -44,7 +82,6 @@ public class GetHeartRate extends WearableActivity implements SensorEventListene
         setContentView(R.layout.activity_start);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        //mHeartRateSensor = Objects.requireNonNull(mSensorManager).getDefaultSensor(Sensor.TYPE_HEART_RATE);
         if (mSensorManager != null) {
             mHeartRateSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
         }
@@ -64,10 +101,7 @@ public class GetHeartRate extends WearableActivity implements SensorEventListene
                     chronometer.setBase(SystemClock.elapsedRealtime());
                 }
                 chronometer.start();
-                startMeasure(); //inizio lettura del battito cardiaco
-                //deve iniziare l'invio dei dati al server heroku (separato o dentro allo start measure?)
-                //se dovessi farlo dentro al metodo, quando chiamo lo stop measure, devo chiudere la connessione con
-                //il server
+                startMeasure(mHeartRateSensor);
                 btStart.setEnabled(false);
                 btStop.setEnabled(true);
             }
@@ -77,8 +111,7 @@ public class GetHeartRate extends WearableActivity implements SensorEventListene
             @Override
             public void onClick(View v) {
                 chronometer.stop();
-                stopMeasure(); //fine lettura del battito cardiaco
-                //deve finire l'invio dei dati al server heroku
+                stopMeasure();
                 chronometer.setBase(SystemClock.elapsedRealtime());
                 lastPause = 0;
                 btStart.setEnabled(true);
@@ -96,12 +129,61 @@ public class GetHeartRate extends WearableActivity implements SensorEventListene
         setAmbientEnabled();
     }
 
-    protected void startMeasure() {
+    protected void startMeasure(Sensor mHeartRateSensor) {
         super.onResume();
+        this.mHeartRateSensor = mHeartRateSensor;
         if (mHeartRateSensor != null) {
             mSensorManager.registerListener(mHeartRateSensorListener, mHeartRateSensor,
                     SensorManager.SENSOR_DELAY_NORMAL);
         }
+
+        doPost();
+    }
+
+    private void doPost() {
+        final OkHttpClient client = new OkHttpClient();
+        final MediaType MEDIA_TYPE = MediaType.parse("application/json");
+
+        JSONObject postData = new JSONObject();
+        try {
+            postData.put("Heartbeat", 80);
+            postData.put("Heartbeat", 82);
+            postData.put("Heartbeat", 85);
+            postData.put("Heartbeat", 100);
+        } catch(JSONException e){
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        RequestBody body = RequestBody.create(MEDIA_TYPE, postData.toString());
+
+        okhttp3.Request request = new okhttp3.Request.Builder()
+                .url("http://layw-server.herokuapp.com/api/v1.0/users/1/heartbeats-real-time")
+                .post(body)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                String mMessage = e.getMessage();
+                Log.w("failure Response", mMessage);
+            }
+
+            @Override
+            public void onResponse(Call call, okhttp3.Response response) throws IOException {
+                String mMessage = response.body().string();
+                if (response.isSuccessful()){
+                    try {
+                        JSONObject json = new JSONObject(mMessage);
+                        final String serverResponse = json.getString("successful Response");
+                        Log.w(serverResponse, mMessage);
+
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     protected void stopMeasure() {
@@ -132,10 +214,6 @@ public class GetHeartRate extends WearableActivity implements SensorEventListene
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        float mHeartRateFloat = event.values[0];
-
-        int mHeartRate = Math.round(mHeartRateFloat);
-
-        mTextView.setText(Integer.toString(mHeartRate));
     }
+
 }
