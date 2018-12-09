@@ -165,13 +165,13 @@ public class GetHeartRate extends WearableActivity implements SensorEventListene
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                String mMessage = e.getMessage();
-                Log.w("failure Response", mMessage);
+                //String mMessage = e.getMessage();
+                //Log.w("failure Response", mMessage);
             }
 
             @Override
             public void onResponse(Call call, okhttp3.Response response) throws IOException {
-                String mMessage = response.body().string();
+                /*String mMessage = response.body().string();
                 if (response.isSuccessful()){
                     try {
                         JSONObject json = new JSONObject(mMessage);
@@ -181,7 +181,7 @@ public class GetHeartRate extends WearableActivity implements SensorEventListene
                     } catch (Exception e){
                         e.printStackTrace();
                     }
-                }
+                }*/
             }
         });
     }
